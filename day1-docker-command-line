@@ -24,3 +24,28 @@
 #ps -a show running or stopped container
 #you will see the continer is in exit state
    48  docker ps -a
+#container vs process id 
+#lets create a mongo db container
+ 51  docker run --name mongo -d mongo:8.2-rc-noble
+   52  docker ps
+#this will show that it is runing as process id
+   53  docker top mongo
+#top command is an native command in linux which will show all the process id press q to come out
+   54  top
+#lets check all the process in linux system using ps aux 
+   55  ps aux
+###docker top mongo will show that mongo db is running using a process id
+   56  docker top mongo
+###with the kill command replace my process id with your id number
+   59  kill -9 8431
+   60  docker ps
+#this will shwo that the container is in exit state 
+   61  docker ps -a
+#you can start stop or remove a container 
+   62  docker start mongo
+   63  docker ps
+   64  docker stop mongo
+   65  docker rm mongo
+   66  docker ps -a
+#if you want to see the utilization of all the container cpu ram storage networking
+   68  docker container stats
