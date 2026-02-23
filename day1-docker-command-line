@@ -18,3 +18,9 @@
    41  docker ps
 #lets try to undestand the purpose of --detach
  docker container run --publish 83:80 nginx
+##press ctrl c 
+#docker ps this will not show the container
+ 47  docker ps
+#ps -a show running or stopped container
+#you will see the continer is in exit state
+   48  docker ps -a
