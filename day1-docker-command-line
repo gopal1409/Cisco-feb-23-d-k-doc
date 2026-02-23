@@ -16,3 +16,5 @@
      #the above command will show that there is apache image download
      ##now docker ps will show there are three container running
    41  docker ps
+#lets try to undestand the purpose of --detach
+ docker container run --publish 83:80 nginx
