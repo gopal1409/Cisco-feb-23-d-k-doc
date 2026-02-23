@@ -40,5 +40,23 @@ bash-5.1# mysql -u root -p
     ###exercise login inside the db again and create a databse 
     ####exit two time and do ls see that the folder is created or not
     
-    
-
+#lets delete the container 
+ 117  docker ps
+#always stop the container
+  118  docker stop db
+#rm will remove the container
+  119  docker rm db
+  120  docker ps -a
+##we will create a new container with the same volume path 
+123  docker run -d --name db -e MYSQL_ALLOW_EMPTY_PASSWORD=true -v mysql-db:/var/lib/mysql mysql:8.4
+#this will show that the container is running with mysql 8.4 version 
+  124  docker ps
+##lets login sinide the container
+[root@docker-engine _data]$ docker exec -it db bash
+bash-5.1# mysql -u root -p
+##once login 
+show databases;
+##you will see the employee db is there as it is 
+exit
+exit
+###############
