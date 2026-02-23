@@ -1,0 +1,5 @@
+#lets install docker
+https://docs.docker.com/engine/install/ubuntu/
+##from this complete the step 1 and 2
+  ##finally once the installation is finished 
+  docker --version
