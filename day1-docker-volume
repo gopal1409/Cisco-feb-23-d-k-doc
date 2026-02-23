@@ -1,0 +1,44 @@
+	1. We will create an mysql container with persistent volume and a label. 
+	2. Login inside the mysql container 
+	3. Create a new database called as employee
+	4. Once I create the db in your storage it will create a folder called as employee
+	5. I will stop the mysql container
+	6. And delete the mysql container. 
+	7. The container will be delete but the storage will not go away
+	8. Create a new container of mysql with same path 
+
+I login inside the container show database should show me the employee db
+    ##lets create our mysql container 
+    #we can pass environment varaibles while creating the container
+    ##to create a volume -v mysql-db: this is the label of the volume another wise it will create volume with some random id /var/lib/mysql is the path inside your container you can refer hub.docker.com mysql cofig
+     100  docker run -d --name db -e MYSQL_ALLOW_EMPTY_PASSWORD=true -v mysql-db:/var/lib/mysql mysql:8.0
+  101  docker ps
+    #this will show the db container created with mysql image
+      105  docker volume ls
+    #inspect command will show that which path is mapped to your container the storage path
+  106  docker volume inspect mysql-db
+  107  cd /var/lib/docker/volumes/mysql-db/_data
+    #if you do ls
+    ls
+    ###this will show all the folder
+################lets login inside the db container 
+    [root@docker-engine _data]$ docker exec -it db bash
+    #once login password we have put empty password just press enter
+bash-5.1# mysql -u root -p
+    ##lets create our database
+    show databases;
+    create database employee;
+    #this will show the employee database is created
+    show databases;
+    ###lets exit the mysql prompt 
+    exit
+    #exit the container
+    exit
+    ###now if i do ls in the path 
+    ls
+    ##you can see the employee db folder
+    ###exercise login inside the db again and create a databse 
+    ####exit two time and do ls see that the folder is created or not
+    
+    
+
