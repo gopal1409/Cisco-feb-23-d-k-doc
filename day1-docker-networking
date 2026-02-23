@@ -1,0 +1,21 @@
+#this will show that there is a container running on port 81
+82  docker ps
+  ##if you are truing to create a new container on the same expose port it will not allow
+   83  docker run -d -p 81:80 nginx
+     ##below command will show all the networks
+   84  docker network ls
+     #i will create a custom network
+   85  docker network create my_app_net
+     #this will show the custom network
+   86  docker network ls
+ #if you inspect the custom network you can see the cidr block
+     88  docker network inspect my_app_net
+   89  docker network ls
+     ##we will create to container in the custom network
+   90  docker run -d --name new_nginx --network my_app_net nginx
+   91  docker run -d --name old_nginx --network my_app_net nginx
+     #inspect will show that both the container are in custom network
+   92  docker network inspect my_app_net
+#lets test the communication between both the container
+   96  docker container exec old_nginx curl new_nginx
+   97  docker container exec new_nginx curl old_nginx
