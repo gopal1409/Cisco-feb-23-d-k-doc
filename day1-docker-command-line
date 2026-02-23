@@ -49,3 +49,11 @@
    66  docker ps -a
 #if you want to see the utilization of all the container cpu ram storage networking
    68  docker container stats
+#lets see the docker infomration about the container
+  72  docker ps
+   73  docker run -p 83:80 -d --name webhost nginx
+   74  docker ps
+   75  curl localhost:83
+   76  docker logs webhost
+   77  docker container inspect webhost
+
