@@ -1,0 +1,10 @@
+ 157  docker images
+   ##this will show the skywalker image from the below command you need to replacve the image id with your own image id 
+   ###in place of gopal1409 you need to replace the same with your hub.docker.com registry name
+  158  docker tag 6162d5639911 gopal1409/skywalker
+   #this is like just creating an nicname to our image
+  159  docker images
+   #lets do docker login it will give you an url and a code login there 
+  160  docker login
+   #once it say login success push the image 
+  161  docker push gopal1409/skywalker
