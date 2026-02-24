@@ -1,0 +1,39 @@
+ 188  git clone https://github.com/gopal1409/spring-hello-multi-build.git
+  189  cd spring-hello-multi-build/
+  190  ls
+    #lets create teh docker file inside the dockerfile you need to copy paster from line 7 till 25
+  191  touch dockerfile
+  192  vi dockerfile
+#-----------stage1: build the application----------
+FROM maven:4.0.0-rc-5-eclipse-temurin-25-noble AS dark
+##we will create and workdir
+WORKDIR /app
+#we will copy the pom.xml
+COPY pom.xml .
+RUN mvn dependency:go-offline
+#we will copy the full src and build the application
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+#------stage2: run the application ---------
+FROM eclipse-temurin:11-jre-ubi9-minimal
+WORKDIR /app
+
+###we need to get only the jar file from the dark stage
+COPY --from=dark /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
+
+  193  docker build multiapp .
+  194  docker build -t multiapp .
+#this will show the multi app
+  199  docker images
+  #lets create an container out of the multi app
+  200  docker container run -d -p 86:8080 multiapp
+  201  docker ps
+  ###access the container from the browser 
+  192.168.100.10:86/hello
+  ##this will show the multi app 
+  ##exercise
+  tag this multi app
+  upload in your hub.docker.com and verify the multi image is uploaded or not
