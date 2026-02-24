@@ -1,0 +1,73 @@
+Step 1: Create a Python Application and requirements.txt 
+First, ensure you have a simple Python application file (e.g., app.py) and a requirements.txt file listing all its dependencies. 
+In your project's terminal, run the following command to generate the requirements.txt file:
+bash
+vi  requirements.txt
+#inside the file just add a simple line 
+  flask
+step2:
+vi app.py
+###inside that add from line 11 till line 19
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello, Docker!'
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+ 
+Step 3: Create a Dockerfile and add line 24 till line 42
+vi dockerfile
+# Use a lightweight official Python runtime as a parent image
+FROM python:3.12-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file into the working directory
+COPY requirements.txt ./
+
+# Install application dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code into the container
+COPY . .
+
+# Expose the port your app runs on
+EXPOSE 5000
+
+# Define the command to run the application when the container starts
+ENTRYPOINT ["python", "app.py"]
+  
+Step 3: Create a .dockerignore file (Optional but Recommended) add line 47 till 57
+To speed up build times and reduce image size, create a file named .dockerignore to exclude unnecessary files and folders (like local environments or Git files) from the Docker build context. 
+  
+TestDriven.io
+TestDriven.io
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.vscode
+Step 4: Build the Docker Image 
+Navigate to your project's root directory in the terminal and run the following command to build your Docker image: 
+bash
+docker build -t my-python-app .
+The -t flag tags the image with a human-readable name (my-python-app).
+The . tells Docker to look for the Dockerfile in the current directory. 
+
+Step 5: Run the Docker Container 
+Once the image is built, run your application in a Docker container using the following command:
+bash
+docker run -d -p 5000:5000 --name my-running-app my-python-app
+  docker ps will show my-running-app which 
+The -d flag runs the container in detached (background) mode.
+The -p flag maps port 5000 on your local machine to port 5000 inside the container.
+The --name flag gives your container a custom name for easy management. 
+Your Python application should now be running in a Docker container, accessible in your web browser at http://192.168.100.10:5000
