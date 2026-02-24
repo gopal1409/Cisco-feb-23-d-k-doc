@@ -17,3 +17,36 @@
     192.168.100.10:8080/hello
       ##this will show the hellow world page
       #after that press ctrl c in the terminal this will close the app
+#we will convert thsi app into an container based image we will create a file called as docker file 
+##inside the docker file we need to provide instruiction
+[root@docker-engine spring-hello]$ touch dockerfile
+[root@docker-engine spring-hello]$ ls
+dockerfile  pom.xml  README.md  src  target
+####################
+#to convert an application into an container based image we need to create a dokcer file in root directory of the folder
+142  touch dockerfile
+  143  ls
+#inside the dockerfile we need to provide instruction copy from line 31 till 39 and paste it inside the docker file and save the file
+  144  vi dockerfile
+FROM eclipse-temurin:11-jre-ubi9-minimal
+#inside the container if i want to create a directory
+WORKDIR /app
+#on top of the base image i need to add my jar file which we have created earlier
+COPY ./target/spring-boot-2-hello-world-1.0.2-SNAPSHOT.jar /app/app.jar
+#in place of copy u can use add instruction
+#we need to put the executable file
+#once the container is in running state we need to put the execution command
+ENTRYPOINT ["java","-jar","/app/app.jar"]
+
+#to build the image docker build -t is tag the image will be build with this name 
+  147  docker build -t skywalker .
+##docker images will show the image created 
+  148  docker images
+#if you want to see the layer of the image replace the image id of skywaler
+  149  docker image history 6162d5639911
+#lets create a container with my sky walker image
+  151  docker container run -d -p 85:8080 skywalker
+#this will show there is container running
+  152  docker ps
+###we will now access the same from browser this time it is being served using a container
+192.168.100.10:85/hello
