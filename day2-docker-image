@@ -1,0 +1,19 @@
+#lets build an spring boot application
+  ##in my local system i need to install jdk
+133  apt install default-jdk
+  #maven
+  134  apt install maven
+  #clone my application
+  135  git clone https://github.com/gopal1409/spring-hello.git
+  136  cd spring-hello/
+    #mvn clean package will compile my app and create a runnable jar file
+  137  mvn clean package
+  138  ls
+  #inside the target folder you can see the jar file 
+  139  ls target/
+    #execute the jar file using java -jar
+  140  java -jar ./target/spring-boot-2-hello-world-1.0.2-SNAPSHOT.jar
+    ##once you application is started open the browser 
+    192.168.100.10:8080/hello
+      ##this will show the hellow world page
+      #after that press ctrl c in the terminal this will close the app
