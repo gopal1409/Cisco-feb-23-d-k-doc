@@ -1,0 +1,10 @@
+#lets expose this deployment 
+130  kubectl get deploy
+ #this will give you the help
+  132  kubectl expose my-first-deployment  --help
+  #we are exposing using NodePort
+  133  kubectl expose deployment my-first-deployment  --type=NodePort --name=my-first-service
+  #this will show the portnumber in 30k series 
+  ##login to any of the nodemachine get the private ip 
+  134  kubectl get svc
+  ####open the browser paste the private ip : port number
