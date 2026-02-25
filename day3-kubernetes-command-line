@@ -9,3 +9,8 @@
    21  crictl ps
   ##change the container id of the kube-apiserver
    22  crictl logs a8d
+#if you want to check the certificate authority
+   25  cd /root/.kube/
+   26  ls
+   27  cat config
+#########################
