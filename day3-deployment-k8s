@@ -1,0 +1,16 @@
+#lets create our deployment
+100  kubectl create deploy my-first-deployment
+  #this will give you help about the deployment
+  101  kubectl create deploy my-first-deployment --help
+  102  kubectl create deploy my-first-deployment --image=nginx --replicas=2 --port=80 --dry-run=client -o yaml
+  #we are creating the deployment with 2 replicas
+  103  kubectl create deploy my-first-deployment --image=nginx --replicas=2 --port=80 --dry-run=client -o yaml > dep.yml
+  104  kubectl apply -f dep.yml
+  105  kubectl get deployment
+#if yo look into the pod there are two pod which is running
+  107  kubectl get pod -o wide
+  #delete one of the pod change my pod id with your own pod id
+  108  kubectl delete pod my-first-deployment-77bdf869fc-486mz
+  #once deleted you will get another pod created due to replicas:2
+  109  kubectl get pod -o wide
+  
