@@ -16,3 +16,32 @@ spec:
    37  kubectl get pod
       ######describe pod will show the event log
    38  kubectl describe pod nginx
+##cpod manifest explanation
+##to apply a manifest file in k8s
+#@kubectl apply -f pod.yml
+#any yaml file you are running it will run from top to bottom and left to right
+apiVersion: v1 #pod api version is v1
+kind: Pod #we are creat a pod
+metadata: #metadata is the information about the pod
+  name: nginx #thje name of the pod will be nginx
+spec: #this is the specification of the pod
+  containers: #this is the container section of the pod
+  - name: nginx #this is the name of the container
+    image: nginx:1.14.2 #image 
+    ports:
+    - containerPort: 80 #container port is 80
+#############################lets do the dry run to deploy our workload in k8s
+#kubectl run help will show how the pod is going to be created
+  42  kubectl run --help
+#replace the image with your own image
+#the below command will generate the sekelton of your pod with image
+   43  kubectl run my-first-pod --image=gopal1409/skywalker --port=8080 --dry-run=client -o yaml
+#you can store the output in a file
+   44  kubectl run my-first-pod --image=gopal1409/skywalker --port=8080 --dry-run=client -o yaml > sky.yml
+   45  cat sky.yml
+#apply it and check the pod come or not after 30 second
+   46  kubectl apply -f sky.yml
+   47  kubectl get pod
+   48  kubectl describe pod my-first-pod
+#if you want to see your pod is running on which node
+kubectl get pod -o wide
