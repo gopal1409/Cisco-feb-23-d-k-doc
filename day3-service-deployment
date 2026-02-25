@@ -8,3 +8,20 @@
   ##login to any of the nodemachine get the private ip 
   134  kubectl get svc
   ####open the browser paste the private ip : port number
+#lets update the image
+ 141  kubectl set image deployment my-first-deployment nginx=nulldevil/phpsysinfo
+#this will show that there is an update going on
+  142  kubectl get deploy
+#now the replicaset will show there are two rs
+  143  kubectl get rs
+#if you look into the describe deploy you will see event where you will see two rs
+  144  kubectl describe deploy my-first-deployment
+  #this will show the rollout status
+  146  kubectl rollout status deploy my-first-deployment
+#this will show the pod
+  147  kubectl get pod
+  148  kubectl describe deploy my-first-deployment
+#now check the ip address of all the pod 
+  149  kubectl get pod -o wide
+#finally refresh the page you will see php sysinfo which is connected to your one pod refresh the page after 30 second
+#it means svc in roudn robin fashion moving the traffic from one pod to another
