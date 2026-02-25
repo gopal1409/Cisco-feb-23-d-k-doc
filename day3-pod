@@ -1,0 +1,18 @@
+#lets create our first pod copy line 3 till line 12
+   35  vi pod.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+##save the file and apply it
+   36  kubectl apply -f pod.yml
+      ####this get will show the pod is running but wait for 30 second to come up
+   37  kubectl get pod
+      ######describe pod will show the event log
+   38  kubectl describe pod nginx
