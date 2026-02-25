@@ -1,0 +1,83 @@
+#this will show all the namespace
+64  kubectl get namespace
+   65  kubectl get ns
+  #if you want to see all the pod in which namespace you can see the same
+   66  kubectl get pod -A
+#this will create a namespace called as dev
+   69  kubectl create ns dev
+  #describe will give more information about ns
+   70  kubectl describe ns dev
+  #now you can see your dev ns
+   71  kubectl get ns
+  ########################inside the namespace we will create quota
+    73  vi quota.yml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: memory-cpu-quota
+  namespace: dev
+spec:
+  hard:
+    requests.cpu: "1"
+    #inside this namespace container will get guranteed 1 cpu
+    #scheduler will also see in which node 1 cpu is available and then it will schedule the pod on that node
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    #this is throttling limit, if the container is using more than 2 cpu then it will be throttled and it will not be able to use more than 2 cpu
+    limits.memory: 2Gi
+      ##once applied
+   74  kubectl apply -f quota.yml
+      #this will not show the resource quota as it is checking in default namespace
+   75  kubectl get resourcequota
+   76  kubectl -n dev get resourcequota
+   77  kubectl -n dev describe resourcequota
+      #lets create a pod in this particular namespace
+       79  vi pod1.yml
+apiVersion: v1
+kind: Pod
+metadata:
+
+  name: quota-me-cpu-pod1
+  namespace: dev #this need to be define so that the pod will run on this specif namespace
+spec:
+  containers:
+  - name: quota-me-cpu-pod1
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80 
+    resources:
+      requests:
+        cpu: "400m" #this is the request for cpu, this is the minimum cpu that the container will get, if the node does not have 0.5 cpu then the pod will not be scheduled on that node
+        memory: 700Mi #this is the request for memory, this is the minimum memory that the container will get, if the node does not have 512Mi memory then the pod will not be scheduled on that node
+      limits:
+        cpu: "800m" #this is the limit for cpu, this is the maximum cpu that the container can use, if the container is using more than 1 cpu then it will be throttled and it will not be able to use more than 1 cpu
+        memory: 700Mi #this is the limit for memory, this is the maximum memory that the container can use, if the container is using more than 1Gi memory then it will
+   80  kubectl apply -f pod1.yml
+   81  kubectl -n dev get pod
+          #now if you describe the namespace it will show the utlization
+   82  kubectl describe ns dev
+##lets create another pod with over utilziation
+           87  vi pod2.yml
+apiVersion: v1
+kind: Pod
+metadata:
+
+  name: quota-me-cpu-pod2
+  namespace: dev #this need to be define so that the pod will run on this specif namespace
+spec:
+  containers:
+  - name: quota-me-cpu-pod1
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80 
+    resources:
+      requests:
+        cpu: "400m" #this is the request for cpu, this is the minimum cpu that the container will get, if the node does not have 0.5 cpu then the pod will not be scheduled on that node
+        memory: 700Mi #this is the request for memory, this is the minimum memory that the container will get, if the node does not have 512Mi memory then the pod will not be scheduled on that node
+      limits:
+        cpu: "800m" #this is the limit for cpu, this is the maximum cpu that the container can use, if the container is using more than 1 cpu then it will be throttled and it will not be able to use more than 1 cpu
+        memory: 800Mi #this is the limit for memory, this is the maximum memory that the container can use, if the container is using more than 1Gi memory then it will
+   88  kubectl describe ns dev
+          #this will not work as already from 1 Gb of request we have already user 700Mb and try to create another pod with 700Mb of mem which over
+   89  kubectl apply -f pod2.yml
+
