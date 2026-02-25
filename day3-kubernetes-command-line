@@ -14,3 +14,7 @@
    26  ls
    27  cat config
 #########################
+#lets gather more information about the nodes
+30  kubectl get nodes
+   31  kubectl get node -o wide
+   32  kubectl describe node eoc-controller
