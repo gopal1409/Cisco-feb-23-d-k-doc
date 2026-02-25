@@ -45,3 +45,28 @@ spec: #this is the specification of the pod
    48  kubectl describe pod my-first-pod
 #if you want to see your pod is running on which node
 kubectl get pod -o wide
+##inside a pod we can run multiple containers
+ 59  vi multi.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: my-multi-pod
+  name: my-multi-pod
+spec:
+  containers:
+  - image: gopal1409/skywalker
+    name: my-first-pod
+    ports:
+    - containerPort: 8080
+  - image: nginx:1.14.2
+    name: nginx
+    ports:
+    - containerPort: 8080
+
+
+   60  kubectl apply -f multi.yml
+#check the pod which is now showing 2/2 means inside the pod we have two container running
+##check that the pod is running on same worker node
+kubectl get pod -o wide
