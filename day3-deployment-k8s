@@ -20,3 +20,36 @@
   122  kubectl get rs
 #pod = deployment+rs+unique hash value for pod
   123  kubectl get pod
+#check both the container labels
+ 127  kubectl get pod --show-labels
+#########################
+#kubectl apply -f dep.yml
+apiVersion: apps/v1
+kind: Deployment #deployment api has a different version
+metadata:
+  creationTimestamp: null
+  labels:
+    app: my-first-deployment
+  name: my-first-deployment #this is the name of the deployment
+spec: #this is the specification of the deployment
+  replicas: 2
+  selector: #it should select something, it should select the pod which is created by this deployment
+    matchLabels:
+      app: my-first-deployment 
+    #it is kind of match expression, it is saying that it should select the pod which has the label app: my-first-deployment
+  strategy: {}
+  template: #inside this two pod we are going to create 
+  #create a template
+    metadata:
+      creationTimestamp: null
+      labels: #same lable should be there in the pod which is created by this deployment
+        app: my-first-deployment
+    spec: #this template has specificat
+      containers: #container defination
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
+
