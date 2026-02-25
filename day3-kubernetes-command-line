@@ -1,0 +1,11 @@
+##how to verify that container are running as process id
+   15  kubectl get nodes
+  ##get pod will show all the system related pod
+   16  kubectl get pod -A
+  ##docker ps will not work
+   17  docker ps
+  ##we can use crictl this will show all the container of k8s
+  #if you want to see the logs of kube-apiserver
+   21  crictl ps
+  ##change the container id of the kube-apiserver
+   22  crictl logs a8d
