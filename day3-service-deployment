@@ -41,4 +41,20 @@
 #describe deploy will show that the name image
   160  kubectl describe deploy my-first-deployment
 ##refresh your page delete everything after the port number now you will see the nginx test page
+#lets scale out the deployment we will do manual scaling
+ 163  kubectl get deploy
+  #scale command will allow you to do manual scaling
+  165  kubectl scale deploy my-first-deployment --replicas=5
+#now get deploy show that you have 5 pod
+  166  kubectl get deploy
+#get pod show 5 pod
+  167  kubectl get pod
+###lets do autoscaling it can be done using cpu network ram
+ 169  kubectl autoscale
+  170  kubectl autoscale --help
+  171  kubectl autoscale deploy my-first-deployment --min=5 --max=10 --cpu-percent=80
+#get hpa horizontal pod autoscaler
+  172  kubectl get hpa
+  173  history
+
   
