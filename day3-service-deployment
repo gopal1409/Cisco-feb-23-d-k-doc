@@ -25,3 +25,20 @@
   149  kubectl get pod -o wide
 #finally refresh the page you will see php sysinfo which is connected to your one pod refresh the page after 30 second
 #it means svc in roudn robin fashion moving the traffic from one pod to another
+##lets check the rollout status and there revison
+#rollout history will show that there is two revision 
+151  kubectl rollout history deployment my-first-deployment
+#if you want to see which image is in revision you can see it
+  152  kubectl rollout history deployment my-first-deployment --revision=1
+  153  kubectl rollout history deployment my-first-deployment --revision=2
+##if you want to roll back to the previous release
+#rs will show that you have two different revision
+  155  kubectl get rs
+#if you want to move to another revision
+  158  kubectl rollout undo deployment my-first-deployment --to-revision=1
+###now yoy will see the previos rs is zero
+  159  kubectl get rs
+#describe deploy will show that the name image
+  160  kubectl describe deploy my-first-deployment
+##refresh your page delete everything after the port number now you will see the nginx test page
+  
