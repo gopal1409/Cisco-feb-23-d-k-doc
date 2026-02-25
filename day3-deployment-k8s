@@ -13,4 +13,10 @@
   108  kubectl delete pod my-first-deployment-77bdf869fc-486mz
   #once deleted you will get another pod created due to replicas:2
   109  kubectl get pod -o wide
-  
+  ##check the deployment rs and pod
+ 121  kubectl get deployment
+#this will show the name of the deployment
+#rs will show the combination of deployment+unique hash value rs
+  122  kubectl get rs
+#pod = deployment+rs+unique hash value for pod
+  123  kubectl get pod
