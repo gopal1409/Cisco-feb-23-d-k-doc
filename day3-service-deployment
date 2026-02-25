@@ -56,5 +56,18 @@
 #get hpa horizontal pod autoscaler
   172  kubectl get hpa
   173  history
+###lets trouble shoot on the networking part dns resolution inside k8s using nslookup 
+ 175  kubectl get svc
+#we will get an dns pod
+  176  kubectl apply -f https://k8s.io/examples/admin/dns/dnsutils.yaml
+  177  kubectl get pod
+#inside the dns pod we will look into kubernetes servcie
+  178  kubectl exec -i -t dnsutils -- nslookup kubernetes.default
+  179  kubectl get svc
+#we can check our service using ns lookup
+  181  kubectl exec -i -t dnsutils -- nslookup my-first-service.default
+#you can use ab bench utility to increase the load 
+  182  kubectl run apache-bench -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http:// my-first-service.default.svc.cluster.local
+  183  kubectl run apache-bench -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http:// my-first-service.default
 
   
