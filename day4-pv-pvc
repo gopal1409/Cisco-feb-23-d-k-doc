@@ -70,4 +70,20 @@ data:
 #in secret manager whatever content you have provide will not display
    37  kubectl describe secret mysql-secret
 
+#lets create configmap
+  39  vi configmap.yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: usermanagement-db-script
+data:
+  mysql_usermgmt.sql: |-
+   DROP DATABASE IF EXISTS webappdb;
+   CREATE DATABASE webappdb;
+  
 
+   40  kubectl apply -f configmap.yml
+ 
+   42  kubectl get configmap
+
+   45  kubectl describe configmap usermanagement-db-script
