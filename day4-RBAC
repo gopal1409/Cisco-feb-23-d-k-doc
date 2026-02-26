@@ -1,0 +1,48 @@
+#lets create a service account called as jane
+  83  kubectl create sa jane
+   84  kubectl get sa jane
+
+   87  kubectl describe sa jane
+  #once we create a sa called as jane 
+  #we will create a namespace called as project-hamster
+    90  kubectl create ns project-hamster
+   91  kubectl get ns
+   92  kubectl describe ns
+##if you see there is no relation ship between jane with project-hamster so this are two individual object in k8s
+  #lets create a role called as phantom
+   95  kubectl -n project-hamster create role
+   96  kubectl -n project-hamster create role --help
+  #when we are creating the role you need to provide two attribute one is verb which is permission second is resource applied to which resource in k8s
+   97  kubectl -n project-hamster create role phantom --verb=create --resource=secret --resource=configmap
+  [root@eoc-controller ~]$ kubectl -n project-hamster describe role phantom
+Name:         phantom
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources   Non-Resource URLs  Resource Names  Verbs
+  ---------   -----------------  --------------  -----
+  configmaps  []                 []              [create]
+  secrets     []                 []              [create]
+##with this role we can create configmap and secret 
+    #lets bind this role with jane service account. 
+     kubectl create rolebinding NAME --clusterrole=NAME|--role=NAME [--user=username] [--group=groupname]
+[--serviceaccount=namespace:serviceaccountname] [--dry-run=server|client|none] [options]
+    #when we are binding the role you need to provide the role name and the service account name
+     102  kubectl -n project-hamster create rolebinding --help
+  103  kubectl -n project-hamster create rolebinding falcon --role=phantom --serviceaccount project-hamster:jane
+  104  kubectl -n project-hamster describe rolebinding falcon
+##$lets test it k8s has create a auth can-i utility which you can use it to test it 
+    [root@eoc-controller ~]$ kubectl -n project-hamster auth can-i create secret --as system:serviceaccount:project-hamster:jane
+yes
+[root@eoc-controller ~]$ kubectl -n project-hamster auth can-i create configmap --as system:serviceaccount:project-hamster:jane
+yes
+[root@eoc-controller ~]$ kubectl -n project-hamster auth can-i create pod --as system:serviceaccount:project-hamster:jane
+no
+[root@eoc-controller ~]$ kubectl -n project-hamster auth can-i create deployment --as system:serviceaccount:project-hamster:jane
+no
+[root@eoc-controller ~]$ kubectl -n project-hamster auth can-i delete deployment --as system:serviceaccount:project-hamster:jane
+no
+[root@eoc-controller ~]$
+
+
+
