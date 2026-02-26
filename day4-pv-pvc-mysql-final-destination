@@ -1,0 +1,118 @@
+##we need to first label the node 
+   48  kubectl get nodes
+   49  kubectl get nodes --show-labels
+  #to create the lable you need to provide the below mentioned command
+   50  kubectl label node eoc-node2 disktype=mysqlssd
+  #show labels will show the label disktype=mysqlssd
+   51  kubectl get nodes --show-labels
+##lets create the mysql deployment
+  71  vi mysql.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec: #in the template specfication we will put nodeselector, affinity, toleration, container defination
+      nodeSelector:
+        disktype: mysqlssd #this will ensure that your pod is running on eoc-node2
+      containers:
+      - name: mysql
+        image: mysql:5.6
+        ports:
+        - containerPort: 3306
+#lets attach the password
+        env: #password will be stored as env varaible to the contaier
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret #this is the name of the secret we creatd inside k8s clsuter
+              key: password
+        volumeMounts: #we will mount the volume
+        - name: mysql-storage
+          mountPath: /var/lib/mysql #this is the path where mysql will store the data
+        - name: mysql-script
+          mountPath: /docker-entrypoint-initdb.d #this is the path where mysql will look for the script to initialize the database
+      volumes: #we will define the volume here
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: task-pv-claim  #this is the name of the pvc which we will create
+      - name: mysql-script
+        configMap:
+          name: usermanagement-db-script #this is the name of the configmap which we will create
+    #finally apply the file 
+   72  kubectl apply -f mysql.yml
+            #wait till the pod is up and running
+            [root@eoc-controller ~]$ kubectl describe deploy mysql
+
+      MYSQL_ROOT_PASSWORD:  <set to the key 'password' in secret 'mysql-secret'>  Optional: false #this is the password attached from secret
+    Mounts:
+      /docker-entrypoint-initdb.d from mysql-script (rw) #configmap 
+      /var/lib/mysql from mysql-storage (rw)
+  Volumes: #the persistent volume
+   mysql-storage:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  task-pv-claim
+    ReadOnly:   false
+      #1. secret: we will login inside the pod
+        2. configmap: run sql command will show the webappdb
+          3. we need to check the eoc-node2 /mnt/data
+      ##lets verify the password work or not in mysql prompt
+          [root@eoc-controller ~]$ kubectl exec -it mysql-6f644bd9c6-pd5n2  -- /bin/bash
+root@mysql-6f644bd9c6-pd5n2:/#
+##lets start the mysql prompt
+          root@mysql-6f644bd9c6-pd5n2:/# mysql -u root -p
+Enter password:
+##enter the password as dbpassword11
+  #you will get the mysql prompt
+  #lets verify the configmap
+  
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| webappdb           |
++--------------------+
+4 rows in set (0.00 sec)
+  #lets exit mysql 
+  exit
+  exit
+  ################
+  #check the eocnode2 in /mnt/data directory
+  [root@eoc-node2 ~]$ ls /mnt/data/
+##you will see the webappdb
+  ###again lets login inside the db 
+  [root@eoc-controller ~]$ kubectl exec -it mysql-6f644bd9c6-pd5n2  -- /bin/bash
+root@mysql-6f644bd9c6-pd5n2:/# mysql -u root -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 2
+Server version: 5.6.51 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database deathstar;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> exit
+Bye
+root@mysql-6f644bd9c6-pd5n2:/# exit
+
+  
+
