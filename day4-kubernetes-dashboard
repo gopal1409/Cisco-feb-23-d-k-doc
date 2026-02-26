@@ -1,0 +1,21 @@
+#we can use headlamp as an k8s dashboard
+  #lets apply it
+115  kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/headlamp/main/kubernetes-headlamp.yaml
+  116  kubectl get pod -A
+    ##this will show the headlamp pod wait for 3 min till it become 1/1
+##this is the headlamp svc which is running as cluster ip change it to nodeport
+  120  kubectl get svc -A
+  
+  121  kubectl -n kube-system edit svc headlamp
+    #
+
+ 33   type: ClusterIP ###change it to NodePort
+ 34 status:
+ 35   loadBalancer: {}
+##now you will get a port number 30k series copy paste the url change the port number to your port number
+  http://192.168.100.12:30183/
+  122  kubectl get svc -A
+    ##once open it is asking for the token
+  123  kubectl -n kube-system create serviceaccount headlamp-admin
+  124  kubectl create clusterrolebinding headlamp-admin --serviceaccount=kube-system:headlamp-admin --clusterrole=cluster-admin
+  125  kubectl create token headlamp-admin -n kube-system
