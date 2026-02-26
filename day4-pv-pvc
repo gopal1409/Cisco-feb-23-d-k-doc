@@ -1,0 +1,59 @@
+#lets login to the eoc-node2 and create a directory 
+  #open the terminal
+  mkdir /mnt/data
+  #this will show that there is no data
+  ls /mnt/data
+  ##########lets create our persistent volume 
+    21  vi pv.yml
+apiVersion: v1
+kind: PersistentVolume  
+metadata:
+  name: task-pv-volume
+spec:
+  capacity:
+    storage: 5Gi  
+  storageClassName: xwing
+  accessModes:
+    - ReadWriteOnce #read #readwritemany
+  volumeMode: Filesystem
+  hostPath:
+    path: "/mnt/data"
+#pv is an admentratively provisioing an storage to your k8s cluster
+   22  kubectl apply -f pv.yml
+   23  kubectl get pv
+      #if you see the name of the claim nothing it is showing
+[root@eoc-controller ~]$ kubectl get pv
+NAME             CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+task-pv-volume   5Gi        RWO            Retain           Available           xwing          <unset>                          5m44s
+
+#lets create the pvc persisntet volume claim which will be mapped with pvc. only pvc can be mapped with a pod
+      [root@eoc-controller ~]$ kubectl get pv
+NAME             CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+task-pv-volume   5Gi        RWO            Retain           Available           xwing          <unset>                          6m44s
+[root@eoc-controller ~]$ vi pvc.yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: task-pv-claim 
+spec:
+  accessModes:
+    - ReadWriteOnce 
+  storageClassName: xwing
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+
+[root@eoc-controller ~]$ kubectl apply -f pvc.yml
+persistentvolumeclaim/task-pv-claim created
+    #now if you see the pv it is bound with your pvc due to the storage class name like we have given xwing
+[root@eoc-controller ~]$ kubectl get pv
+NAME             CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+task-pv-volume   5Gi        RWO            Retain           Bound    default/task-pv-claim   xwing          <unset>                          7m19s
+    #get pvc will show that it is mapped with pv
+[root@eoc-controller ~]$ kubectl get pvc
+NAME            STATUS   VOLUME           CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+task-pv-claim   Bound    task-pv-volume   5Gi        RWO            xwing          <unset>                 16s
+[root@eoc-controller ~]$
+
+
