@@ -55,5 +55,19 @@ task-pv-volume   5Gi        RWO            Retain           Bound    default/tas
 NAME            STATUS   VOLUME           CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
 task-pv-claim   Bound    task-pv-volume   5Gi        RWO            xwing          <unset>                 16s
 [root@eoc-controller ~]$
+####lets create secret 
+34  vi secret.yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+type: Opaque
+data:
+  password: ZGJwYXNzd29yZDEx
+
+   35  kubectl apply -f secret.yml
+   36  kubectl get secret
+#in secret manager whatever content you have provide will not display
+   37  kubectl describe secret mysql-secret
 
 
