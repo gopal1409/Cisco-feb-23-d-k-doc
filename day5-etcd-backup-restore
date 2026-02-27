@@ -1,0 +1,84 @@
+###lets install the etcdctl tool in the master node
+   262  apt install etcd-client
+  263  etcdctl
+#####lets find out where the manifest file of your master machine are located '
+  #this will show that master node are running as pod which is running using some yaml file
+   266  kubectl get pod -A
+  #this is the place where your yaml file is located
+  267  cd /etc/kubernetes/manifests/
+  268  ls
+  ##from this yaml to interact with etcd we ned client certificate client key and ca certificate path
+  269  cat kube-apiserver.yaml
+  ###if i grep the etcd this will give me the path for ca.crt
+  [root@eoc-controller manifests]$ cat kube-apiserver.yaml | grep etcd
+    - --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt
+    - --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt
+    - --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key
+    - --etcd-servers=https://127.0.0.1:2379
+  ##once you get the path lets take the backup of etcd
+   277  ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/apiserver-etcd-client.crt --key=/etc/kubernetes/pki/apiserver-etcd-client.key snapshot save /tmp/etcd-backup.db
+  ##once it has taken the backup we can see it in temp directory
+  278  ls /tmp/
+  ##we will create a pod after the backup
+  [root@eoc-controller manifests]$ kubectl run testpod --image=nginx
+pod/testpod created
+[root@eoc-controller manifests]$ kubectl get pod testpod
+NAME      READY   STATUS    RESTARTS   AGE
+testpod   1/1     Running   0          8s
+[root@eoc-controller manifests]$
+###the pod is created after the backup
+  #lets shutdown all the master component
+  #if you move your manifest file to another folder all the master componet will be down
+  ################
+  [root@eoc-controller manifests]$ cd /etc/kubernetes/manifests/
+##check all the manifest file are there or not 
+  [root@eoc-controller manifests]$ ls
+  ##lets move the manifest file to a previous directory 
+  [root@eoc-controller manifests]$ mv * ..
+  #once you move it the directory will be empty
+[root@eoc-controller manifests]$ ls
+  #you can see the manigest file in the previous directory
+[root@eoc-controller manifests]$ ls /etc/kubernetes/
+admin.conf               etcd.yaml            kube-controller-manager.yaml  kube-scheduler.yaml  pki             super-admin.conf
+controller-manager.conf  kube-apiserver.yaml  kubelet.conf                  manifests            scheduler.conf  tmp
+[root@eoc-controller manifests]$ kubectl get nodes
+The connection to the server 192.168.100.11:6443 was refused - did you specify the right host or port?
+[root@eoc-controller manifests]$ crictl ps
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD                                        NAMESPACE
+d93fa2c8f9203       1cf5f116067c6       2 hours ago         Running             coredns                   0                   437dd0cda8698       coredns-674b8bbfcf-zfd97                   kube-system
+05ec1229de74c       761b294e26556       2 hours ago         Running             calico-kube-controllers   0                   595b3db09cde0       calico-kube-controllers-576865d959-bg4vf   kube-system
+3584db8b905ce       b79c189b052cd       3 hours ago         Running             kube-proxy                0                   0b8186fe42b9c       kube-proxy-l2kmm                           kube-system
+f78ff9f9f4d34       cc52550d767f7       30 hours ago        Running             calico-node               3                   df406a1a89a37       calico-node-8qrx8                          kube-system
+
+  [root@eoc-controller manifests]$ kubectl get nodes
+The connection to the server 192.168.100.11:6443 was refused - did you specify the right host or port?
+[root@eoc-controller manifests]$ crictl ps
+CONTAINER           IMAGE               CREATED 
+  #lets restore the backup
+  
+ 291  ETCDCTL_API=3 etcdctl snapshot restore /tmp/etcd-backup.db --data-dir /var/lib/etcd-backup --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/apiserver-etcd-client.crt --key=/etc/kubernetes/pki/apiserver-etcd-client.key
+  292  ls /var/lib/etcd-backup/
+####once restore i need to change the path of etcd 
+   87   - hostPath:
+ 88       path: /var/lib/etcd #lets change the path to 
+ 89       type: DirectoryOrCreate
+ 90     name: etcd-data
+##we need to change the path to new path 
+   7   - hostPath:
+ 88       path: /var/lib/etcd-backup #change done
+ 89       type: DirectoryOrCreate
+ 90     name: etcd-data
+###once you restore anmd change the path of etcd to the new location
+   ##we will move all the controle plane manifest file to the current directory
+   [root@eoc-controller manifests]$ cd /etc/kubernetes/manifests/
+[root@eoc-controller manifests]$ mv ../*.yaml .
+[root@eoc-controller manifests]$ ls
+##once we move all the file to the current directory 
+crictl ps
+ 298  crictl ps
+ ####
+  299  kubectl get nodes
+  #check that testpod will not be there
+  300  kubectl get pod
+
+
