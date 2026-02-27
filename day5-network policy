@@ -104,4 +104,28 @@ spec:
   180  kubectl -n ecom exec frontend -- curl 10.10.203.20
 #using the pod ip address it is working
 
+#lets open port 53 dns port 
+188  vi deny2.yml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: ecom
+spec:
+  podSelector: {} #from here we start creating exception
+
+  policyTypes:
+  - Ingress
+  - Egress
+  egress:
+  - to:
+    ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+#you can use the replace command to replace an exiting object in k8s
+  189  kubectl replace -f deny2.yml
+##dns resultion will work
+  191  kubectl -n ecom exec frontend -- curl backend
 
