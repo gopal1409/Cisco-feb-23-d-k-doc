@@ -45,4 +45,63 @@ spec:
 #this time curl request will not work
   159  kubectl -n ecom exec backend -- curl frontend
   160  kubectl -n ecom exec frontend -- curl backend
+##lets create the exception where frontend can intiate connection to backend
+ 165  vi frontend-policy.yml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-policy
+  namespace: ecom 
+spec:
+  podSelector: #frontend want to intiate connection to the backend and mysql so we will create the policy for frontend
+    matchLabels:
+      run: frontend
+  #in pod selector we will select the frontend pod but how to select the frontend pod we will use the label
+  policyTypes:
+  - Ingress
+  - Egress
+  egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            run: backend
+  166  kubectl apply -f frontend-policy.yml
+
+  168  kubectl -n ecom get networkpolicy
+#describe command will show the policy egree routing from frontend to backend
+  169  kubectl -n ecom describe networkpolicy frontend-policy
+#now also it will not work
+  170  kubectl -n ecom exec frontend -- curl backend
+#we need to create another policy where backend should accept the connection from frontend
+  172  vi backend-policy.yml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-policy
+  namespace: ecom 
+spec:
+  podSelector: #frontend want to intiate connection to the backend and mysql so we will create the policy for frontend
+    matchLabels:
+      run: backend
+  #in pod selector we will select the frontend pod but how to select the frontend pod we will use the label
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            run: frontend
+  173  kubectl apply -f backend-policy.yml
+ 
+  175  kubectl -n ecom get networkpolicy
+  176  kubectl -n ecom describe networkpolicy backend-policy
+##now if i try to send traffic from frontend to backend - backend should accept the traffic
+#if i try to send the traffic from frontend to backend it will not work
+ 178  kubectl -n ecom exec frontend -- curl backend
+  179  kubectl -n ecom get pod -o wide
+##copy the ip address of the backend replace my if with your ip
+  180  kubectl -n ecom exec frontend -- curl 10.10.203.20
+#using the pod ip address it is working
+
 
