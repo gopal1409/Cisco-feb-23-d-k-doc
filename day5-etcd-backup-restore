@@ -59,6 +59,9 @@ CONTAINER           IMAGE               CREATED
  291  ETCDCTL_API=3 etcdctl snapshot restore /tmp/etcd-backup.db --data-dir /var/lib/etcd-backup --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/apiserver-etcd-client.crt --key=/etc/kubernetes/pki/apiserver-etcd-client.key
   292  ls /var/lib/etcd-backup/
 ####once restore i need to change the path of etcd 
+##open this file and change the path 
+ 294  vi /etc/kubernetes/etcd.yaml
+##inside this file you need to go extreme below
    87   - hostPath:
  88       path: /var/lib/etcd #lets change the path to 
  89       type: DirectoryOrCreate
