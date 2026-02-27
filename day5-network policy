@@ -128,4 +128,5 @@ spec:
   189  kubectl replace -f deny2.yml
 ##dns resultion will work
   191  kubectl -n ecom exec frontend -- curl backend
+#exercise start backend to frontend traffic
 
