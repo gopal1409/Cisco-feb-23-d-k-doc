@@ -24,4 +24,25 @@
   152  kubectl -n ecom exec frontend -- curl backend
   153  kubectl -n ecom exec backend -- curl frontend
 ###both the way communication is happening
+#to disable the communication betwen this pod isnide the namespace we need to create an deny rule
+ 155  vi default-deny.yml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: ecom 
+spec:
+  podSelector: {} #from here we start creating exception
+    
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  156  kubectl apply -f default-deny.yml
+  157  kubectl -n ecom get networkpolicy
+#if you describe the policy you will see everything is disabled ingress and egress routing
+  158  kubectl -n ecom describe networkpolicy default-deny
+#this time curl request will not work
+  159  kubectl -n ecom exec backend -- curl frontend
+  160  kubectl -n ecom exec frontend -- curl backend
 
