@@ -1,0 +1,29 @@
+#lets upgrade the worker node 
+   242  kubectl get nodes
+  #we will drain the eoc-node1
+  243  kubectl drain eoc-node1
+  244  kubectl drain eoc-node1 --ignore-daemonsets
+  #we need to forcefully do the draining which means we are evicting all the running pod from that node
+  245  kubectl drain eoc-node1 --ignore-daemonsets --force
+#once drain it will show scheduling disables menas no more pod can run in this node
+  [root@eoc-controller ~]$ kubectl get nodes
+NAME             STATUS                     ROLES           AGE    VERSION
+eoc-controller   Ready                      control-plane   211d   v1.33.1
+eoc-node1        Ready,SchedulingDisabled   node            211d   v1.33.0
+
+  #upgrading the node required to be done on the eoc-node1 machine only
+  #we will login to eoc node1 machine
+  16  apt-get update
+  #this will show the version you have
+   17  apt-cache madison kubectl
+   18  sudo apt-mark unhold kubelet kubectl && sudo apt-get update && sudo apt-get install -y kubelet='1.33.1-1.1' kubectl='1.33.1-1.1' && sudo apt-mark hold kubelet kubectl
+  ##update it then restart the kubelet service
+  systemctl restart kubelet
+  ###once restart we will run the upgrade process from the master node all the belwo command need to be run in the master node
+   247  kubectl get nodes
+  248  kubeadm upgrade node
+  #do not forget to uncordong the eoc-node1
+  249  kubectl uncordon eoc-node1
+  250  kubectl get nodes
+
+
