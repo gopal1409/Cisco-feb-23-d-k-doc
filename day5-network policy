@@ -1,0 +1,27 @@
+#this network policy is implemented using calico cni plugin
+  #check the nodes is any of the nodes is showing not ready to trouble shoot
+  a. first check kubelet is running or not
+    135  systemctl status kubelet
+
+  b. check containerd is running of not 
+  136  systemctl status containerd
+
+  c. check the cni pod is running or not 
+   132  kubectl get nodes
+  133  kubectl get pod -A
+  ###as network policy will be applied in namespace 
+  #we will create a namespace and create two pod inside the namespace and check they are communication with each other or not
+   139  kubectl create ns ecom
+  140  kubectl -n ecom run frontend --image=nginx
+  141  kubectl -n ecom run backend --image=nginx
+  142  kubectl -n ecom get pod
+###lets expose or create service for your pod 
+   146  kubectl -n ecom expose pod frontend --port 80
+  147  kubectl -n ecom expose pod backend --port 80
+
+  149  kubectl -n ecom get pod,svc
+  #lets check that frontend can communicate with backend or not 
+  152  kubectl -n ecom exec frontend -- curl backend
+  153  kubectl -n ecom exec backend -- curl frontend
+###both the way communication is happening
+
