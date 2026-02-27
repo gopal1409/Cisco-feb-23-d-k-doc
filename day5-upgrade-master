@@ -1,0 +1,58 @@
+#first we will upgrade the master node then we will upgrade the worker node
+  #lets check which version of k8s cluster i am running
+[root@eoc-controller ~]$ kubectl get nodes -o wide
+NAME             STATUS   ROLES           AGE    VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+eoc-controller   Ready    control-plane   211d   v1.33.0   192.168.100.11   <none>        Ubuntu 24.04.2 LTS   6.17.0-14-generic   containerd://1.7.27
+eoc-node1        Ready    node            211d   v1.33.0   192.168.100.12   <none>        Ubuntu 24.04.2 LTS   6.17.0-14-generic   containerd://1.7.27
+eoc-node2        Ready    node            211d   v1.33.0   192.168.100.13   <none>        Ubuntu 24.04.2 LTS   6.17.0-14-generic   conta
+  ##this will show the kubeadm version
+  #lets update the system and check what kubeadm version they have
+   197  apt-get update
+  198  apt-cache madision kubeadm
+###this will show the version of k8s
+  [root@eoc-controller ~]$ apt-cache madison kubeadm
+
+   kubeadm | 1.33.1-1.1 | https://pkgs.k8s.io/core:/stable:/v1.33/deb  Packages
+   kubeadm | 1.33.0-1.1 | https://pkgs.k8s.io/core:/stable:/v1.33/deb  Packages
+ ##this will be upgrade to this version 1.33.1-1.1
+   206  kubectl version
+  
+  208  kubelet --version
+  ##before we upgrade we need to cordon off the node disable the scheduler so that no new workload will be executed on that particualr node also need to evict all the unnecessary container
+  [root@eoc-controller ~]$ kubectl drain eoc-controller --ignore-daemonsets
+node/eoc-controller already cordoned
+Warning: ignoring DaemonSet-managed Pods: kube-system/calico-node-8qrx8, kube-system/kube-proxy-tn9bc
+evicting pod kube-system/coredns-674b8bbfcf-x2hwg
+evicting pod kube-system/calico-kube-controllers-576865d959-vmnqb
+evicting pod kube-system/coredns-674b8bbfcf-9hh2h
+pod/calico-kube-controllers-576865d959-vmnqb evicted
+pod/coredns-674b8bbfcf-x2hwg evicted
+pod/coredns-674b8bbfcf-9hh2h evicted
+node/eoc-controller drained
+  #now if you see there will be no new workload can be run due to scheduling disabled using drain command
+[root@eoc-controller ~]$ kubectl get nodes
+NAME             STATUS                     ROLES           AGE    VERSION
+eoc-controller   Ready,SchedulingDisabled   control-plane   211d   v1.33.0
+eoc-node1        Ready                      node            211d   v1.33.0
+eoc-node2        Ready                      node            211d   v1.33.0
+[root@eoc-controller ~]$
+  ##check the version you want to upgrade
+  sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.33.1-1.1' && \
+sudo apt-mark hold kubeadm
+  #######################
+  kubeadm version 
+  ###thios will show 1.33.1
+  ##next we need to run upgrade plan
+  kubeadm upgrade plan
+  #the upgrade plan show 1.33.8 but we need to do 1.33.1
+  kubeadm upgrade apply v1.33.1
+  ##once done we need to upgrade the kubelet
+  235  apt-get install kubelet='1.33.1-1.1'
+#need to restart the kubelet service
+  237  systemctl restart kubelet
+ ##uncrodong the node so that it will be back to your cluster
+  239  kubectl uncordon eoc-controller
+   238  kubectl get nodes -o wide
+
+
